@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#050505" />
+  <title>SILLEY 57 - PRO v51</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root{
+      --bg:#050505;
+      --surface:#121212;
+      --surface-highlight:#1e1e1e;
+      --border:#27272a;
+      --text-main:#ededed;
+      --text-muted:#737373;
+      --accent:#3b82f6;
+      --accent-dim:rgba(59,130,246,.15);
+      --success:#10b981;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --safe-top:env(safe-area-inset-top);
+      --safe-bottom:env(safe-area-inset-bottom);
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none}
+
+    body{
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background-color:var(--bg);
+      color:var(--text-main);
+      margin:0;padding:0;
+      min-height:100vh;
+      padding-bottom:calc(80px + var(--safe-bottom));
+      -webkit-font-smoothing:antialiased;
+      isolation:isolate;
+    }
+
+    .container{padding:24px 16px;padding-top:calc(20px + var(--safe-top));max-width:600px;margin:0 auto}
+    h1,h2,h3{margin:0;font-weight:900;letter-spacing:-.03em;text-transform:uppercase}
+
+    /* --- SPLASH --- */
+    #splash{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background-color:var(--bg);z-index:9999;
+      display:flex;align-items:center;justify-content:center;flex-direction:column;
+      transition:opacity .6s ease-out,visibility .6s
+    }
+    .splash-logo{font-size:42px;font-weight:900;letter-spacing:-2px;color:var(--text-main)}
+    .splash-sub{font-size:12px;font-weight:700;letter-spacing:4px;color:var(--accent);margin-top:10px;text-transform:uppercase}
+
+    /* --- CARDS --- */
+    .card{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:20px;
+      margin-bottom:12px
+    }
+
+    /* --- BUTTONS --- */
+    .btn{
+      display:flex;align-items:center;justify-content:center;width:100%;padding:16px;
+      background:var(--text-main);color:#000;border:none;border-radius:6px;
+      font-size:14px;font-weight:800;letter-spacing:.5px;cursor:pointer;
+      text-transform:uppercase;transition:opacity .2s
+    }
+    .btn:active{opacity:.8}
+    .btn-secondary{background:var(--surface-highlight);border:1px solid var(--border);color:var(--text-main)}
+    .btn-pill{
+      background:var(--surface-highlight);border:1px solid var(--border);
+      padding:6px 12px;border-radius:100px;font-size:10px;font-weight:700;
+      color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;
+      display:inline-flex;align-items:center;gap:6px
+    }
+
+    /* --- TYPE --- */
+    .label{font-size:10px;color:var(--text-muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;display:block}
+    .value-huge{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1}
+    .mono-num{font-family:'Inter',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.5px;font-weight:600}
+
+    /* --- INPUTS --- */
+    .input-dark{
+      background:var(--bg);border:1px solid var(--border);color:var(--text-main);
+      border-radius:6px;padding:12px;text-align:center;font-size:16px;
+      width:100%;font-family:inherit;font-weight:600
+    }
+    .note-area{
+      width:100%;background:var(--bg);border:1px solid var(--border);
+      color:var(--text-main);padding:12px;border-radius:6px;margin-top:10px;
+      min-height:80px;font-family:inherit;font-size:14px
+    }
+
+    /* --- NAV --- */
+    .nav{
+      position:fixed;bottom:0;left:0;right:0;
+      background:rgba(5,5,5,.95);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-top:1px solid var(--border);
+      display:flex;justify-content:space-around;
+      padding-top:12px;padding-bottom:calc(12px + var(--safe-bottom));
+      z-index:100
+    }
+    .nav-item{
+      background:none;border:none;display:flex;flex-direction:column;
+      align-items:center;gap:5px;color:#404040;
+      font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase
+    }
+    .nav-item.active{color:var(--text-main)}
+    .nav-icon{width:24px;height:24px;stroke-width:2.5px}
+
+    /* --- CHART --- */
+    .chart-container{width:100%;height:180px;margin-top:15px;position:relative}
+
+    /* --- WORKOUT LIST --- */
+    .workout-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:24px 20px;background:var(--surface);border:1px solid var(--border);
+      border-radius:8px;margin-bottom:8px;cursor:pointer
+    }
+    .workout-row:active{background:var(--surface-highlight)}
+    .status-badge{
+      font-size:9px;font-weight:800;padding:4px 8px;border-radius:4px;
+      text-transform:uppercase;letter-spacing:.5px;
+      background:var(--surface-highlight);border:1px solid var(--border);color:var(--text-muted)
+    }
+    .status-done{background:rgba(16,185,129,.15);color:var(--success);border-color:rgba(16,185,129,.3)}
+
+    /* --- MODAL --- */
+    .modal-overlay{
+      position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,.85);z-index:200;
+      display:flex;justify-content:center;align-items:flex-end;
+      backdrop-filter:blur(5px);
+      opacity:0;pointer-events:none;transition:opacity .2s
+    }
+    .modal-overlay.open{opacity:1;pointer-events:auto}
+    .modal-sheet{
+      background:var(--surface);width:100%;max-width:600px;
+      border-radius:20px 20px 0 0;padding:24px;
+      padding-bottom:calc(30px + var(--safe-bottom));
+      transform:translateY(100%);
+      transition:transform .3s cubic-bezier(.2,.8,.2,1);
+      border-top:1px solid var(--border);
+      max-height:92vh;overflow-y:auto
+    }
+    .modal-overlay.open .modal-sheet{transform:translateY(0)}
+
+    /* --- UTILS --- */
+    .flex-row{display:flex;justify-content:space-between;align-items:center}
+    .close-abs{position:absolute;top:20px;right:20px;font-size:24px;padding:10px;cursor:pointer;color:var(--text-muted)}
+    .section-header{margin-top:30px;font-size:11px;font-weight:800;letter-spacing:1px;color:var(--accent);margin-bottom:15px;border-bottom:1px solid var(--border);padding-bottom:5px}
+    .interactive-text{text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:4px;cursor:pointer;color:#fff}
+    .interactive-text:hover{color:var(--accent);text-decoration-color:var(--accent)}
+    .js-exercise-link{display:inline-block}
+
+    .phase-header-btn{
+      background:var(--surface-highlight);border:1px solid var(--accent);
+      color:var(--accent);padding:12px;border-radius:6px;
+      font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+      margin-bottom:24px;text-align:center;cursor:pointer;
+      box-shadow:0 4px 12px rgba(59,130,246,.15)
+    }
+
+    /* QUIT BUTTON — stable hit-testing */
+    .quit-btn-fixed{
+      position:fixed;top:calc(var(--safe-top) + 20px);right:20px;
+      width:42px;height:42px;border-radius:50%;
+      background:rgba(30,30,30,.98);
+      display:grid;place-items:center;
+      color:var(--text-muted);
+      border:1px solid var(--border);
+      z-index:2147483647;
+      transform:translate3d(0,0,0);
+      will-change:transform;
+      cursor:pointer;font-size:22px;
+      box-shadow:0 6px 18px rgba(0,0,0,.55);
+      -webkit-appearance:none;appearance:none;
+      padding:0;margin:0;outline:none;line-height:0;
+      pointer-events:auto !important;
+      touch-action:manipulation;
+      -webkit-user-select:none;user-select:none
+    }
+    .quit-btn-fixed:active{color:#fff;background:var(--danger);border-color:var(--danger);transform:translate3d(0,0,0) scale(.96)}
+
+    /* --- SET GRID --- */
+    .set-grid{display:grid;grid-template-columns:40px 1fr 1fr 44px;gap:12px;align-items:center;margin-bottom:12px}
+    .set-check{width:44px;height:44px;border-radius:6px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:transparent;transition:all .2s}
+    .set-check.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .set-col-1{display:flex;flex-direction:column;align-items:center;justify-content:center;height:44px}
+    .copy-badge{
+      font-size:8px;font-weight:900;letter-spacing:.5px;
+      color:#000;background:var(--accent);padding:2px 4px;border-radius:3px;
+      margin-top:4px;cursor:pointer;text-transform:uppercase
+    }
+
+    /* Calendar */
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:15px}
+    .cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);border-radius:4px;background:var(--bg);border:1px solid var(--border);position:relative}
+    .cal-day.today{border-color:var(--accent);color:var(--text-main)}
+    .cal-dot{width:4px;height:4px;border-radius:50%;margin-top:4px}
+    .cal-dot-wrap{display:flex;gap:3px;margin-top:4px;align-items:center;justify-content:center}
+
+    .hidden{display:none}
+
+    /* Sliders */
+    input[type=range]{-webkit-appearance:none;width:100%;background:transparent;margin:10px 0}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:28px;width:28px;border-radius:50%;background:var(--text-main);cursor:pointer;margin-top:-12px;box-shadow:0 2px 6px rgba(0,0,0,.5);border:2px solid var(--surface)}
+    input[type=range]::-webkit-slider-runnable-track{width:100%;height:4px;cursor:pointer;background:var(--border);border-radius:2px}
+
+    /* Readiness Banner */
+    .readiness-banner{
+      padding:16px;border-radius:8px;margin-bottom:24px;
+      display:flex;flex-direction:column;gap:4px;border:1px solid transparent
+    }
+
+    /* History List */
+    .hist-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+    .hist-item:last-child{border-bottom:none}
+  </style>
+</head>
+
+<body>
+  <div id="splash">
+    <div class="splash-logo">SILLEY 57</div>
+    <div class="splash-sub">ATHLETE v51</div>
+  </div>
+
+  <div id="app" class="container"></div>
+
+  <div class="nav">
+    <button class="nav-item active" id="btn-dash" onclick="renderDashboard()">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      Overview
+    </button>
+    <button class="nav-item" id="btn-train" onclick="renderTraining()">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6.5 6.5h11"></path><path d="M6.5 17.5h11"></path><path d="M6.5 12h11"></path>
+        <path d="M3 3v18"></path><path d="M21 3v18"></path>
+      </svg>
+      Program
+    </button>
+    <button class="nav-item" id="btn-hist" onclick="renderHistory()">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      History
+    </button>
+  </div>
+
+  <div id="modal" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="modal-sheet" id="modal-body"></div>
+  </div>
+
+  <button id="global-quit-btn" type="button" class="quit-btn-fixed hidden" aria-label="Session Options">×</button>
+
+  <script>
+    // --- UTILS ---
+    function sanitizeId(str){ return String(str || '').replace(/[^a-zA-Z0-9]/g,''); }
+    function escapeHtml(str){
+      return String(str ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    function roundTo5(n){ return Math.round(n / 5) * 5; }
+    function parseNum(v){ const n = Number(v); return Number.isFinite(n) ? n : null; }
+
+    // --- STATE ---
+    const DEFAULT_SETTINGS = {
+      weight: 205,           // lbs
+      height: "6'3",
+      sex: "unspecified",    // male | female | unspecified
+      age: 0,                // optional
+      gripBaseline: 120      // lbs
+    };
+
+    const appState = {
+      currentWeek: JSON.parse(localStorage.getItem('hockeyV47Week')) || 1,
+      viewWeek: JSON.parse(localStorage.getItem('hockeyV47Week')) || 1,
+      workoutLogs: JSON.parse(localStorage.getItem('hockeyV47Logs')) || [],
+      activeSession: JSON.parse(localStorage.getItem('hockeyV47Active')) || null,
+      exerciseHistory: JSON.parse(localStorage.getItem('hockeyV47ExHistory')) || {},
+      currentGraphEx: "Trap-Bar Deadlift",
+      settings: (() => {
+        const saved = JSON.parse(localStorage.getItem('hockeyV47Settings')) || {};
+        return { ...DEFAULT_SETTINGS, ...saved };
+      })(),
+      activeExercises: []
+    };
+
+    let modalStack = [];
+
+    function rebuildExerciseHistory(){
+      appState.exerciseHistory = {};
+      const chronLogs = [...appState.workoutLogs].reverse();
+      chronLogs.forEach(log=>{
+        if(log.type === 'gym' && log.exercises){
+          log.exercises.forEach(ex=>{
+            if(!appState.exerciseHistory[ex.name]) appState.exerciseHistory[ex.name] = [];
+            appState.exerciseHistory[ex.name].unshift({ date: log.date, weight: ex.weight, reps: ex.reps, note: ex.note });
+          });
+        }
+      });
+      localStorage.setItem('hockeyV47ExHistory', JSON.stringify(appState.exerciseHistory));
+    }
+    rebuildExerciseHistory();
+
+    // --- PROGRAM INFO ---
+    const PHASE_INFO = {
+      1:{ title:"PHASE 1: ECCENTRIC & TISSUE TOLERANCE", focus:"BRAKING POWER & JOINT HEALTH", desc:"Hockey is a game of deceleration. Before we can add speed, your brakes must be bulletproof. This phase uses slow eccentric tempos to thicken tendons (ACL protection)." },
+      2:{ title:"PHASE 2: MAX STRENGTH & CONTRAST", focus:"FORCE PRODUCTION & RECRUITMENT", desc:"Building the engine. We use 'Contrast Training' (Post-Activation Potentiation). Pairing heavy lifts with plyometrics teaches your body to apply strength instantly." },
+      3:{ title:"PHASE 3: VELOCITY & POWER", focus:"RATE OF FORCE DEVELOPMENT (RFD)", desc:"Game speed. Reduced volume to keep legs fresh, focusing on moving sub-maximal weights fast. Minimizing ground contact time." }
+    };
+
+    const EXERCISE_DB = {
+      "Trap-Bar Deadlift": { swaps:["Barbell Deadlift","Sumo Deadlift"], why:"Develops raw lower-body force essential for the skating stride. Neutral grip reduces spinal stress." },
+      "Split Squat (DB)": { swaps:["Rear Foot Elev. Split Squat","Walking Lunge"], why:"Builds single-leg structural integrity, correcting imbalances that lead to ACL injury." },
+      "Rear Foot Elev. Split Squat": { swaps:["Split Squat","Single Leg Press"], why:"Lengthens hip flexors while strengthening glutes/VMO. Critical for skating posture." },
+      "Goblet Squat": { swaps:["Front Squat","Safety Bar Squat"], why:"Enforces upright torso mechanics required for efficient skating." },
+      "Front Squat": { swaps:["Goblet Squat","High Bar Back Squat"], why:"Anterior load demands thoracic extension and core bracing under pressure." },
+      "Single Leg RDL": { swaps:["Staggered Stance RDL","Cable Pull Through"], why:"Posterior chain stabilizer. Prevents hamstring strains during rapid extension." },
+      "Nordic Curl": { swaps:["Machine Hamstring Curl","Swiss Ball Curl"], why:"Gold standard for ACL prevention. Eccentric loading makes hamstrings resilient." },
+      "Box Jump (Soft Land)": { swaps:["Broad Jump","Tuck Jump"], why:"Vertical power output. 'Soft landing' cue teaches force absorption (injury prevention)." },
+      "Depth Drop to Stick": { swaps:["Box Jump","Snap Down"], why:"Teaches the nervous system to absorb force rapidly (eccentric RFD). Prerequisite for cutting." },
+      "Skater Jumps": { swaps:["Lateral Bound","Heiden Hop"], why:"Direct transfer to skating stride push-off and edge control." },
+      "Copenhagen Plank": { swaps:["Adductor Machine","Side Plank"], why:"Isometrically strengthens adductors (groin), the most common hockey soft-tissue injury." },
+      "World's Greatest Stretch": { swaps:["Inchworm","Spiderman Lunge"], why:"The ultimate warmup. Mobilizes hips, thoracic spine, and ankles in one dynamic flow." },
+      "Pogo Hops": { swaps:["Jump Rope","Ankle Hops"], why:"Builds ankle stiffness for efficient energy transfer (spring) in the skating stride." },
+      "90/90 Hip Flow": { swaps:["Hip Swivels","Gate Openers"], why:"Improves internal/external hip rotation, essential for deep skating stances." },
+      "SL Glute Bridge": { swaps:["Bridge","Hip Thrust"], why:"Activates glutes and hamstrings before heavy loading." },
+      "Inchworm": { swaps:["Walkouts","Bear Crawl"], why:"Dynamic hamstring stretch and core stability." },
+      "Lateral Heiden Bound": { swaps:["Skater Jumps","Lateral Lunge"], why:"Develops lateral power and landing mechanics for edge control." },
+      "Tibialis Raises": { swaps:["Heel Walks","Toe Taps"], why:"Strengthens shins to prevent shin splints and improve deceleration control." },
+      "Pallof Press": { swaps:["Plank","Dead Bug"], why:"Anti-rotation core stability. Helps you stay strong on the puck while being pushed." },
+      "Seated Row": { swaps:["DB Row","Face Pulls"], why:"Upper back strength for posture and puck protection." },
+      "DB Bench Press": { swaps:["Push Ups","Floor Press"], why:"Horizontal pushing strength for battles in the corner." },
+      "Sled Push/Drag": { swaps:["Hill Sprints","Wall Sit"], why:"Unilateral lower body power without eccentric loading (easier on joints)." },
+      "Med Ball Rotational Throw": { swaps:["Woodchoppers","Cable Rotation"], why:"Rotational power transfer, directly mimicking the shooting motion." },
+      "Chin Up (Weighted)": { swaps:["Lat Pulldown","Pull Ups"], why:"Vertical pulling strength for overall upper body power." },
+      "RDL (Barbell)": { swaps:["DB RDL","Good Morning"], why:"Posterior chain strength. Key for speed generation." },
+      "Face Pulls": { swaps:["Band Pull Aparts","Y-Raises"], why:"Rotator cuff health and shoulder stability." },
+      "Suitcase Carry": { swaps:["Farmer Walk","Side Plank"], why:"Dynamic core stability and grip strength." },
+      "Dead Bug": { swaps:["Bird Dog","Hollow Hold"], why:"Teaches core bracing while moving limbs, essential for on-ice stability." },
+      "Walking Lunge": { swaps:["Split Squat","Step Up"], why:"Dynamic single-leg strength and stability." },
+      "TKE (Band)": { swaps:["Peterson Step Up","VMO Squat"], why:"Terminal Knee Extension. Isolates the VMO for knee tracking health." },
+      "Broad Jump": { swaps:["Box Jump","Trap Bar Jump"], why:"Horizontal power production. Directly correlates to acceleration speed." },
+      "Hurdle Hops": { swaps:["Box Jump","Tuck Jump"], why:"Elastic power and landing mechanics." },
+      "Depth Jump": { swaps:["Drop Jump","Box Jump"], why:"Reactive power. Teaches muscles to switch from stretch to shorten instantly." },
+      "DB Shoulder Press": { swaps:["Landmine Press","Push Press"], why:"Vertical pushing strength and shoulder stability." },
+      "Lateral Band Walk": { swaps:["Clamshells","Monster Walk"], why:"Glute medius activation for hip stability." },
+      "Lateral Lunge": { swaps:["Cossack Squat","Sumo Squat"], why:"Frontal plane strength. mimic the wide stance of skating." }
+    };
+
+    const programData = {
+      1:[
+        { id:"p1d1", name:"Day 1: Deceleration", blocks:[
+          {type:"warmup", items:[{name:"World's Greatest Stretch", sets:2, reps:5}, {name:"Copenhagen Plank", sets:3, reps:"20s"}]},
+          {type:"power", items:[{name:"Depth Drop to Stick", sets:3, reps:5, cue:"Silent landing"}]},
+          {type:"strength", items:[{name:"Trap-Bar Deadlift", sets:4, reps:6, cue:"3s Lowering", ph:225}]},
+          {type:"accessory", items:[{name:"Nordic Curl", sets:3, reps:5, cue:"Assisted / Eccentric Only"}, {name:"DB Bench Press", sets:3, reps:10, ph:50}]}
+        ]},
+        { id:"p1d2", name:"Day 2: Unilateral", blocks:[
+          {type:"warmup", items:[{name:"90/90 Hip Flow", sets:2, reps:"60s"}, {name:"SL Glute Bridge", sets:2, reps:10}]},
+          {type:"power", items:[{name:"Lateral Heiden Bound", sets:3, reps:"5/side", cue:"Stick landing"}]},
+          {type:"strength", items:[{name:"Rear Foot Elev. Split Squat", sets:3, reps:"8/side", cue:"Control knee valgus", ph:40}]},
+          {type:"accessory", items:[{name:"Seated Row", sets:3, reps:12, ph:120}, {name:"Pallof Press", sets:3, reps:10}]}
+        ]},
+        { id:"p1d3", name:"Day 3: Multi-Planar", blocks:[
+          {type:"warmup", items:[{name:"Inchworm", sets:2, reps:5}, {name:"Copenhagen Plank", sets:3, reps:"20s"}]},
+          {type:"power", items:[{name:"Pogo Hops", sets:3, reps:15, cue:"Stiff ankles"}]},
+          {type:"strength", items:[{name:"Lateral Lunge", sets:3, reps:"8/side", ph:35}]},
+          {type:"accessory", items:[{name:"Pull Ups", sets:3, reps:"AMRAP"}, {name:"Swiss Ball Hamstring Curl", sets:3, reps:12}]}
+        ]}
+      ],
+      2:[
+        { id:"p2d1", name:"Day 1: Linear Contrast", blocks:[
+          {type:"warmup", items:[{name:"World's Greatest Stretch", sets:2, reps:5}, {name:"TKE (Band)", sets:2, reps:15}]},
+          {type:"strength", items:[{name:"Trap-Bar Deadlift", label:"A1", sets:4, reps:4, cue:"Heavy", ph:255}, {name:"Broad Jump", label:"A2", sets:4, reps:4, cue:"Max distance"}]},
+          {type:"accessory", items:[{name:"Walking Lunge", sets:3, reps:"10/side"}, {name:"Chin Up (Weighted)", sets:3, reps:6}]}
+        ]},
+        { id:"p2d2", name:"Day 2: Vertical Contrast", blocks:[
+          {type:"warmup", items:[{name:"Spiderman Lunge", sets:2, reps:5}, {name:"SL Glute Bridge", sets:2, reps:10}]},
+          {type:"strength", items:[{name:"Front Squat", label:"A1", sets:4, reps:5, cue:"Fast Up", ph:135}, {name:"Box Jump (Soft Land)", label:"A2", sets:4, reps:5, cue:"High Box"}]},
+          {type:"accessory", items:[{name:"RDL (Barbell)", sets:3, reps:8}, {name:"Face Pulls", sets:3, reps:15}]}
+        ]},
+        { id:"p2d3", name:"Day 3: Lateral Contrast", blocks:[
+          {type:"warmup", items:[{name:"Inchworm", sets:2, reps:5}, {name:"Lateral Band Walk", sets:2, reps:15}]},
+          {type:"strength", items:[{name:"Lateral Lunge", label:"A1", sets:3, reps:"6/side", ph:55}, {name:"Skater Jumps", label:"A2", sets:3, reps:"5/side"}]},
+          {type:"accessory", items:[{name:"DB Bench Press", sets:3, reps:8}, {name:"Suitcase Carry", sets:3, reps:"30s"}]}
+        ]}
+      ],
+      3:[
+        { id:"p3d1", name:"Day 1: Speed Strength", blocks:[
+          {type:"warmup", items:[{name:"World's Greatest Stretch", sets:2, reps:5}, {name:"Pogo Hops", sets:2, reps:15}]},
+          {type:"strength", items:[{name:"Trap-Bar Deadlift", label:"A1", sets:3, reps:3, cue:"Speed (50%)", ph:185}, {name:"Hurdle Hops", label:"A2", sets:3, reps:4, cue:"Bounce"}]},
+          {type:"accessory", items:[{name:"Single Leg RDL", sets:3, reps:"8/side"}, {name:"Dead Bug", sets:3, reps:"30s"}]}
+        ]},
+        { id:"p3d2", name:"Day 2: Reactive Power", blocks:[
+          {type:"warmup", items:[{name:"Spiderman Lunge", sets:2, reps:5}, {name:"Tibialis Raises", sets:2, reps:15}]},
+          {type:"strength", items:[{name:"Split Squat (DB)", label:"A1", sets:3, reps:5, cue:"Jump if able", ph:60}, {name:"Depth Jump", label:"A2", sets:3, reps:3, cue:"Min ground time"}]},
+          {type:"accessory", items:[{name:"Sled Push/Drag", sets:4, reps:"30y", cue:"Max Effort"}]}
+        ]},
+        { id:"p3d3", name:"Day 3: Game Ready", blocks:[
+          {type:"warmup", items:[{name:"Inchworm", sets:2, reps:5}, {name:"Lateral Band Walk", sets:2, reps:15}]},
+          {type:"strength", items:[{name:"Med Ball Rotational Throw", label:"A1", sets:3, reps:8}, {name:"Lateral Heiden Bound", label:"A2", sets:3, reps:"5/side"}]},
+          {type:"accessory", items:[{name:"Pull Ups", sets:3, reps:8}, {name:"DB Shoulder Press", sets:3, reps:10}]}
+        ]}
+      ]
+    };
+
+    // --- PERSONALIZATION: readiness + suggested weights ---
+    function getReadinessMultiplier(score){
+      if(!Number.isFinite(score)) return 1.0;
+      if(score < 50) return 0.85;
+      if(score < 80) return 0.95;
+      return 1.0;
+    }
+
+    function getSexMultiplier(){
+      // Only apply if explicitly set; otherwise don't guess.
+      const s = (appState.settings.sex || "unspecified").toLowerCase();
+      if(s === "female") return 0.90;
+      if(s === "male") return 1.00;
+      return 1.00;
+    }
+
+    function getBodyweightMultiplier(){
+      const w = parseNum(appState.settings.weight);
+      if(!w || w <= 0) return 1.0;
+      // Program placeholders were authored around ~205 lbs athlete; scale gently.
+      return clamp(w / 205, 0.85, 1.15);
+    }
+
+    function getSuggestedWeight(ph, readinessScore){
+      if(!Number.isFinite(ph) || ph <= 0) return null;
+      const bw = getBodyweightMultiplier();
+      const sex = getSexMultiplier();
+      const r = getReadinessMultiplier(readinessScore);
+      const raw = ph * bw * sex * r;
+      return Math.max(0, roundTo5(raw));
+    }
+
+    // --- readiness score (now includes grip relative to baseline if provided) ---
+    function calculateReadinessScore(r){
+      if(!r) return 0;
+
+      const sleep = clamp(parseInt(r.sleep || 0), 0, 5);
+      const energy = clamp(parseInt(r.energy || 0), 0, 5);
+      const pain = clamp(parseInt(r.pain || 0), 0, 10);
+
+      // Base: same as before (0..100)
+      let base = Math.round(((sleep + energy + (10 - pain)) / 20) * 100);
+
+      // Grip adjustment:
+      // - Only if both baseline + today's grip are present and reasonable
+      // - Adds up to +10 (great CNS day) or down to -15 (fatigued day)
+      const baseline = parseNum(appState.settings.gripBaseline);
+      const today = parseNum(r.grip);
+
+      if(baseline && baseline > 0 && today && today > 0){
+        const ratio = today / baseline; // 1.00 = baseline
+        // Map ratio to adjustment:
+        // 1.10+ => +10, 1.00 => 0, 0.90 => -10, 0.85 => -15
+        let adj = 0;
+        if(ratio >= 1.10) adj = 10;
+        else if(ratio >= 1.00) adj = Math.round((ratio - 1.00) / 0.10 * 10); // 0..10
+        else if(ratio >= 0.90) adj = -Math.round((1.00 - ratio) / 0.10 * 10); // 0..-10
+        else if(ratio >= 0.85) adj = -10 - Math.round((0.90 - ratio) / 0.05 * 5); // -10..-15
+        else adj = -15;
+
+        base = base + adj;
+      }
+
+      return clamp(base, 0, 100);
+    }
+
+    // --- RENDER: DASH ---
+    function renderDashboard(){
+      toggleQuitBtn(false);
+      updateNav('btn-dash');
+
+      const historyData = appState.exerciseHistory[appState.currentGraphEx] || [];
+      const recentLifts = historyData.slice(0,7).reverse();
+      const svgContent = generateSVGGraph(recentLifts);
+
+      let resumeHtml = '';
+      if(appState.activeSession){
+        resumeHtml = `
+          <div class="card" style="border-left:3px solid var(--accent);cursor:pointer;"
+               onclick="loadWorkout('${appState.activeSession.workoutId}')">
+            <div class="flex-row">
+              <div>
+                <div class="label" style="color:var(--accent);">SESSION IN PROGRESS</div>
+                <div style="font-weight:700;font-size:15px;color:#fff;">RESUME NOW</div>
+              </div>
+              <div class="btn-pill" style="background:var(--accent);color:#fff;border:none;">GO &rarr;</div>
+            </div>
+          </div>`;
+      }
+
+      let readinessHtml = `<div class="value-huge" style="color:var(--text-muted);font-size:24px;">--</div>`;
+      if(appState.workoutLogs.length > 0 && appState.workoutLogs[0].readiness){
+        const score = calculateReadinessScore(appState.workoutLogs[0].readiness);
+        const color = score > 80 ? 'var(--success)' : (score < 50 ? 'var(--danger)' : 'var(--warning)');
+        readinessHtml = `<div class="value-huge" style="color:${color}">${score}%</div>
+                         <div class="label" style="margin-top:4px;">${escapeHtml(appState.workoutLogs[0].date)}</div>`;
+      }
+
+      document.getElementById('app').innerHTML = `
+        <div style="margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;">
+          <h1 style="font-size:22px;">DASHBOARD</h1>
+          <div class="btn-pill">WEEK ${appState.currentWeek} / 12</div>
+        </div>
+
+        ${resumeHtml}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div class="card" style="padding:16px;margin:0;">
+            <div class="label">WORKOUTS DONE</div>
+            <div class="value-huge">${appState.workoutLogs.length}</div>
+          </div>
+          <div class="card" style="padding:16px;margin:0;cursor:pointer;" onclick="showReadinessDetails()">
+            <div class="label">READINESS</div>
+            ${readinessHtml}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-row">
+            <div class="label">PROGRESS TRACKER</div>
+            <select style="background:transparent;border:none;color:var(--accent);font-weight:700;font-size:11px;text-align:right;"
+                    onchange="updateGraph(this.value)">
+              ${Object.keys(EXERCISE_DB).map(ex=>`<option value="${escapeHtml(ex)}" ${ex===appState.currentGraphEx?'selected':''}>${escapeHtml(ex)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="chart-container">${svgContent}</div>
+        </div>
+
+        <button class="btn" style="background:var(--accent);color:#fff;margin-bottom:12px;" onclick="renderTraining()">START TRAINING</button>
+        <button class="btn btn-secondary" onclick="initiateCheckIn('game', true)">LOG GAME</button>
+
+        <div style="text-align:center;margin-top:30px;">
+          <span class="label" style="cursor:pointer;text-decoration:underline;" onclick="renderSettings()">APP SETTINGS</span>
+        </div>`;
+    }
+
+    function renderTraining(){
+      toggleQuitBtn(false);
+      updateNav('btn-train');
+
+      const phase = getPhase(appState.viewWeek);
+      const workouts = programData[phase] || programData[1];
+
+      let html = `
+        <div class="flex-row" style="margin-bottom:20px;">
+          <button style="background:none;border:none;color:var(--text-muted);font-size:24px;" onclick="changeViewWeek(-1)">‹</button>
+          <div style="text-align:center;">
+            <div class="label">CURRENT VIEW</div>
+            <div style="font-weight:800;font-size:16px;">WEEK ${appState.viewWeek}</div>
+          </div>
+          <button style="background:none;border:none;color:var(--text-muted);font-size:24px;" onclick="changeViewWeek(1)">›</button>
+        </div>
+
+        <div class="phase-header-btn" onclick="showPhaseEducation(${phase})">
+          ${PHASE_INFO[phase].title} <span style="font-size:14px;">ⓘ</span>
+        </div>`;
+
+      workouts.forEach(w=>{
+        const logs = appState.workoutLogs.filter(l=>l.workout === w.name && l.type === 'gym' && l.phase === phase);
+        let badge = '';
+        if(logs.length > 0) badge = `<div class="status-badge status-done">✓ COMPLETE</div>`;
+        html += `
+          <div class="workout-row" onclick="previewWorkout('${w.id}')">
+            <div>
+              <div style="font-weight:700;font-size:15px;color:#fff;margin-bottom:4px;">${escapeHtml(w.name)}</div>
+              <div class="label" style="margin:0;">60 MIN • STRENGTH & POWER</div>
+            </div>
+            ${badge}
+          </div>`;
+      });
+
+      document.getElementById('app').innerHTML = html;
+    }
+
+    function startOrResume(id){
+      closeModal();
+      if(appState.activeSession && appState.activeSession.workoutId === id){
+        loadWorkout(id);
+      } else if(appState.activeSession){
+        if(confirm("Discard current active session?")){
+          appState.activeSession = null;
+          localStorage.removeItem('hockeyV47Active');
+          initiateCheckIn(id, false);
+        }
+      } else {
+        initiateCheckIn(id, false);
+      }
+    }
+
+    // --- MODAL HELPERS ---
+    function openModalContent(html){
+      modalStack = [];
+      document.getElementById('modal-body').innerHTML = `<div class="close-abs" onclick="closeModal()">×</div>` + html;
+      document.getElementById('modal').classList.add('open');
+    }
+    function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+    function showReadinessDetails(){
+      const latest = appState.workoutLogs.length ? appState.workoutLogs[0] : null;
+      const score = latest?.readiness ? calculateReadinessScore(latest.readiness) : null;
+      const base = latest?.readiness
+        ? Math.round(((parseInt(latest.readiness.sleep||0)+parseInt(latest.readiness.energy||0)+(10-parseInt(latest.readiness.pain||0)))/20)*100)
+        : null;
+
+      const grip = latest?.readiness?.grip ? Number(latest.readiness.grip) : null;
+      const baseline = Number(appState.settings.gripBaseline || 0) || null;
+      let gripLine = `<div class="label" style="margin:0;color:var(--text-muted);">GRIP: --</div>`;
+      if(grip && baseline){
+        const pct = Math.round((grip / baseline) * 100);
+        gripLine = `<div class="label" style="margin:0;color:var(--text-muted);">GRIP: <span style="color:#fff">${grip} lbs</span> (${pct}% of baseline)</div>`;
+      } else if(grip){
+        gripLine = `<div class="label" style="margin:0;color:var(--text-muted);">GRIP: <span style="color:#fff">${grip} lbs</span></div>`;
+      }
+
+      openModalContent(`
+        <h1 style="margin-top:20px;font-size:24px;">LATEST READINESS</h1>
+        <div style="font-size:60px;font-weight:800;margin-bottom:10px;color:var(--accent)">${score ?? '--'}%</div>
+        <div class="card" style="padding:16px;">
+          <div class="label" style="margin:0;color:var(--text-muted);">BASE SCORE: <span style="color:#fff">${base ?? '--'}%</span></div>
+          ${gripLine}
+          <div class="label" style="margin:0;color:var(--text-muted);">PROFILE: <span style="color:#fff">${escapeHtml(appState.settings.sex || 'unspecified')}</span>, <span style="color:#fff">${escapeHtml(appState.settings.weight)} lbs</span></div>
+        </div>
+        <button class="btn" onclick="closeModal()">CLOSE</button>`);
+    }
+
+    function showPhaseEducation(phase){
+      const info = PHASE_INFO[phase];
+      openModalContent(`
+        <div class="label" style="margin-top:20px;color:var(--accent);">PROGRAMMING INSIGHT</div>
+        <h1 style="font-size:24px;margin-bottom:10px;">${escapeHtml(info.title)}</h1>
+        <div style="font-weight:700;margin-bottom:20px;color:#fff;">GOAL: ${escapeHtml(info.focus)}</div>
+        <p style="color:var(--text-muted);line-height:1.6;font-size:15px;">${escapeHtml(info.desc)}</p>
+        <button class="btn" style="margin-top:20px;" onclick="closeModal()">GOT IT</button>`);
+    }
+
+    function initiateCheckIn(workoutId, isGame){
+      openModalContent(`
+        <h1 style="font-size:24px;margin-top:20px;margin-bottom:30px;">${isGame ? "PRE-GAME LOG" : "READINESS CHECK"}</h1>
+
+        <div class="card">
+          <div class="flex-row"><span class="label">SLEEP QUALITY</span><span id="disp-sleep" style="font-weight:800;font-size:18px;">3/5</span></div>
+          <input type="range" min="1" max="5" value="3" step="1" id="in-sleep" oninput="updateSliderUI(this,'disp-sleep','/5')">
+        </div>
+
+        <div class="card">
+          <div class="flex-row"><span class="label">ENERGY LEVEL</span><span id="disp-energy" style="font-weight:800;font-size:18px;">3/5</span></div>
+          <input type="range" min="1" max="5" value="3" step="1" id="in-energy" oninput="updateSliderUI(this,'disp-energy','/5')">
+        </div>
+
+        <div class="card">
+          <div class="flex-row"><span class="label" style="color:var(--danger);">PAIN / SORENESS</span><span id="disp-pain" style="font-weight:800;font-size:18px;color:var(--danger);">0/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" id="in-pain" oninput="updateSliderUI(this,'disp-pain','/10')">
+        </div>
+
+        <div class="card">
+          <div class="label">CNS GRIP TEST (LBS)</div>
+          <input type="number" id="in-grip" class="input-dark" inputmode="numeric" placeholder="Baseline: ${escapeHtml(appState.settings.gripBaseline)}">
+          <div class="label" style="margin-top:8px; color:var(--text-muted);">Tip: enter 3 squeezes, take best number.</div>
+        </div>
+
+        <button class="btn" style="background:var(--accent);color:#fff;" onclick="confirmCheckIn('${workoutId}', ${isGame})">
+          ${isGame ? "CONTINUE" : "START SESSION"}
+        </button>`);
+
+      updateSliderUI(document.getElementById('in-sleep'), 'disp-sleep', '/5');
+      updateSliderUI(document.getElementById('in-energy'), 'disp-energy', '/5');
+      updateSliderUI(document.getElementById('in-pain'), 'disp-pain', '/10');
+    }
+
+    function updateSliderUI(el, displayId, suffix){
+      const val = parseInt(el.value);
+      document.getElementById(displayId).innerText = val + suffix;
+
+      let color = "var(--text-main)";
+      if(el.id === 'in-pain'){
+        if(val > 4) color = "var(--danger)";
+        else if(val > 1) color = "var(--warning)";
+        else color = "var(--success)";
+      } else {
+        if(val < 3) color = "var(--danger)";
+        else if(val === 3) color = "var(--warning)";
+        else color = "var(--success)";
+      }
+      document.getElementById(displayId).style.color = color;
+    }
+
+    function confirmCheckIn(id, isGame){
+      const readiness = {
+        sleep: document.getElementById('in-sleep').value,
+        pain: document.getElementById('in-pain').value,
+        energy: document.getElementById('in-energy').value,
+        grip: document.getElementById('in-grip').value
+      };
+
+      closeModal();
+
+      if(isGame){
+        saveGameLog(readiness);
+      } else {
+        appState.activeSession = { workoutId:id, week:appState.viewWeek, readiness:readiness, inputs:{} };
+        saveActiveState();
+        loadWorkout(id);
+      }
+    }
+
+    function saveGameLog(readiness){
+      openModalContent(`
+        <h1 style="font-size:24px;margin-top:20px;">GAME STATS</h1>
+        <div class="card"><div class="label">MINUTES PLAYED</div><input id="g-min" type="number" class="input-dark" value="60"></div>
+        <div class="card"><div class="label">NOTES</div><textarea id="g-notes" class="note-area"></textarea></div>
+        <button class="btn" onclick="commitGameLog()">SAVE</button>`);
+      window.tempReadiness = readiness;
+    }
+
+    function commitGameLog(){
+      const log = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(),
+        type: 'game',
+        workout: 'GAME',
+        duration: document.getElementById('g-min').value,
+        notes: document.getElementById('g-notes').value,
+        readiness: window.tempReadiness
+      };
+      appState.workoutLogs.unshift(log);
+      saveAndRebuild();
+      closeModal();
+      renderDashboard();
+    }
+
+    function previewWorkout(id){
+      if(appState.activeSession && appState.activeSession.workoutId === id){ loadWorkout(id); return; }
+      const phase = getPhase(appState.viewWeek);
+      const w = programData[phase].find(x=>x.id===id) || programData[1].find(x=>x.id===id);
+
+      let contentHtml = '';
+      w.blocks.forEach(block=>{
+        contentHtml += `<div class="section-header">${escapeHtml(block.type)}</div>`;
+        block.items.forEach(ex=>{
+          const name = ex.name || ex;
+          contentHtml += `
+            <div class="flex-row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+              <div style="font-size:14px;font-weight:600;color:#fff;">${escapeHtml(name)}</div>
+              <div style="font-size:12px;color:var(--text-muted);" class="mono-num">${escapeHtml(ex.sets)} x ${escapeHtml(ex.reps)}</div>
+            </div>`;
+        });
+      });
+
+      openModalContent(`
+        <div class="label" style="margin-top:20px;">WORKOUT PREVIEW</div>
+        <h1 style="font-size:24px;margin-bottom:15px;">${escapeHtml(w.name)}</h1>
+        <div class="card" style="max-height:50vh;overflow-y:auto;padding-top:0;">${contentHtml}</div>
+        <button class="btn" style="background:var(--accent);color:#fff;" onclick="startOrResume('${w.id}')">START SESSION</button>`);
+    }
+
+    // --- ACTIVE WORKOUT VIEW ---
+    function loadWorkout(id){
+      toggleQuitBtn(true);
+
+      const phase = getPhase(appState.activeSession ? appState.activeSession.week : appState.viewWeek);
+      const w = programData[phase].find(x=>x.id===id) || programData[1].find(x=>x.id===id);
+
+      const rScore = appState.activeSession?.readiness ? calculateReadinessScore(appState.activeSession.readiness) : null;
+
+      let readinessBanner = '';
+      if(Number.isFinite(rScore)){
+        let rColor = "var(--success)";
+        let rBg = "rgba(16, 185, 129, 0.15)";
+        let rText = "GREEN LIGHT: Push for PRs.";
+        if(rScore < 50){ rColor="var(--danger)"; rBg="rgba(239, 68, 68, 0.15)"; rText="RED LIGHT: Reduce weight/volume."; }
+        else if(rScore < 80){ rColor="var(--warning)"; rBg="rgba(245, 158, 11, 0.15)"; rText="YELLOW LIGHT: Stick to the plan."; }
+
+        readinessBanner = `
+          <div class="readiness-banner" style="background:${rBg};border-color:${rColor};">
+            <div class="flex-row">
+              <div class="label" style="color:${rColor};margin:0;">READINESS SCORE</div>
+              <div style="font-weight:900;color:${rColor};font-size:18px;">${rScore}%</div>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:${rColor};opacity:.9;">${rText}</div>
+          </div>`;
+      }
+
+      appState.activeExercises = [];
+
+      let html = `
+        <div class="flex-row" style="margin-bottom:20px;padding-top:20px;">
+          <div class="status-badge" style="color:var(--accent);">LIVE SESSION</div>
+        </div>
+        <h1 style="font-size:28px;margin-bottom:10px;">${escapeHtml(w.name)}</h1>
+        ${readinessBanner}`;
+
+      w.blocks.forEach(block=>{
+        html += `<div class="section-header">${escapeHtml(block.type)}</div>`;
+        block.items.forEach(ex=>{
+          appState.activeExercises.push(ex);
+          const exIdx = appState.activeExercises.length - 1;
+
+          const name = ex.name || ex;
+          const safeName = sanitizeId(name);
+
+          html += `
+            <div class="card" id="ex_${exIdx}" data-name="${escapeHtml(name)}">
+              <div class="flex-row" style="margin-bottom:15px;">
+                <span class="interactive-text js-exercise-link" role="button" tabindex="0"
+                      style="font-weight:700;font-size:16px;" data-ex-index="${exIdx}">
+                  ${escapeHtml(name)}
+                </span>
+                <span class="btn-pill" style="font-size:9px;" onclick="toggleNote(this)">NOTE</span>
+              </div>
+
+              <textarea class="note-area hidden" oninput="trackInput('n_${safeName}', this.value)">${escapeHtml(getSavedValue('n_'+safeName))}</textarea>
+
+              <div class="set-grid"><div class="label" style="text-align:center;">#</div><div class="label">LBS</div><div class="label">REPS</div><div></div></div>
+              ${generateSetRows(ex.sets, ex.reps, ex.ph, name, rScore)}
+            </div>`;
+        });
+      });
+
+      html += `<div style="height:60px;"></div>
+               <button class="btn" style="background:var(--success);color:#fff;" onclick="finishSession('${escapeHtml(w.name)}')">
+                 COMPLETE WORKOUT
+               </button>`;
+
+      document.getElementById('app').innerHTML = html;
+      window.scrollTo(0,0);
+    }
+
+    function generateSetRows(sets, reps, ph, name, readinessScore){
+      const safeName = sanitizeId(name);
+      const suggested = getSuggestedWeight(ph, readinessScore);
+      const placeholder = (suggested && suggested > 0) ? String(suggested) : (ph ? String(ph) : '-');
+
+      let rows = '';
+      for(let i=1;i<=sets;i++){
+        const uid = safeName + i;
+        const wVal = getSavedValue('w_'+uid);
+        const rVal = getSavedValue('r_'+uid);
+        const cVal = getSavedValue('c_'+uid) === 'true';
+
+        let col1 = `<div style="font-weight:700;color:var(--text-muted);text-align:center;">${i}</div>`;
+        if(i === 1){
+          col1 = `
+            <div class="set-col-1">
+              <div style="font-weight:700;color:var(--text-muted);">${i}</div>
+              <div class="copy-badge" onclick="copySetData('${safeName}', ${sets})">COPY</div>
+            </div>`;
+        }
+
+        rows += `
+          <div class="set-grid">
+            ${col1}
+            <input type="number" id="w_${uid}" class="input-dark weight-input" placeholder="${escapeHtml(placeholder)}"
+                   value="${escapeHtml(wVal)}" oninput="trackInput('w_${uid}', this.value)">
+            <input type="text" id="r_${uid}" class="input-dark reps-input"
+                   value="${escapeHtml(rVal || reps)}" oninput="trackInput('r_${uid}', this.value)">
+            <div class="set-check ${cVal?'active':''}" onclick="toggleSet(this,'c_${uid}')">✓</div>
+          </div>`;
+      }
+      return rows;
+    }
+
+    function copySetData(safeName, sets){
+      const baseW = document.getElementById('w_' + safeName + '1').value;
+      const baseR = document.getElementById('r_' + safeName + '1').value;
+      for(let i=2;i<=sets;i++){
+        const uid = safeName + i;
+        document.getElementById('w_'+uid).value = baseW;
+        document.getElementById('r_'+uid).value = baseR;
+        trackInput('w_'+uid, baseW);
+        trackInput('r_'+uid, baseR);
+      }
+    }
+
+    // --- EXERCISE MENU ---
+    function openExerciseMenu(index){
+      const ex = appState.activeExercises[index];
+      if(!ex) return;
+
+      const name = ex.name || ex;
+      const direct = EXERCISE_DB[name];
+      const fuzzyKey = Object.keys(EXERCISE_DB).find(k=>name.includes(k));
+      const db = direct || (fuzzyKey ? EXERCISE_DB[fuzzyKey] : null);
+      const safeSearch = encodeURIComponent(name + " exercise");
+
+      const whyHtml = db?.why
+        ? `<div class="card" style="margin-top:15px;border-left:3px solid var(--accent);">
+             <div class="label" style="color:var(--accent);">HOCKEY BENEFIT</div>
+             <p style="font-size:14px;margin:0;">${escapeHtml(db.why)}</p>
+           </div>`
+        : `<div class="card" style="margin-top:15px;color:var(--text-muted);font-size:14px;">No benefit note added for this exercise yet.</div>`;
+
+      const swapsHtml = (db?.swaps && db.swaps.length)
+        ? db.swaps.map(s=>`<button type="button" class="btn btn-secondary" style="margin-bottom:8px;">${escapeHtml(s)}</button>`).join('')
+        : `<div class="card" style="padding:16px;color:var(--text-muted);font-size:13px;">No swaps listed.</div>`;
+
+      openModalContent(`
+        <div class="label" style="margin-top:20px;color:var(--accent);">EXERCISE DETAILS</div>
+        <h1 style="font-size:24px;margin-bottom:10px;">${escapeHtml(name)}</h1>
+        ${whyHtml}
+        <div class="section-header">SWAPS</div>
+        ${swapsHtml}
+        <a href="https://www.youtube.com/results?search_query=${safeSearch}" target="_blank" rel="noopener"
+           class="btn" style="margin-top:15px;">WATCH VIDEO</a>
+        <button class="btn btn-secondary" style="margin-top:10px;" onclick="closeModal()">CLOSE</button>`);
+    }
+
+    // --- FINISH SESSION ---
+    function finishSession(name){
+      const timestamp = new Date();
+      const currentPhase = getPhase(appState.activeSession.week);
+
+      let exercises = [];
+      document.querySelectorAll('.card[id^="ex_"]').forEach(card=>{
+        const exName = card.getAttribute('data-name') || '';
+        let maxWeight = 0;
+        let maxReps = 0;
+
+        card.querySelectorAll('.weight-input').forEach((input,i)=>{
+          const w = parseInt(input.value) || 0;
+          const repsEl = card.querySelectorAll('.reps-input')[i];
+          const r = repsEl ? (parseInt(repsEl.value) || 0) : 0;
+
+          if(w > maxWeight){ maxWeight = w; maxReps = r; }
+          else if(w === maxWeight && r > maxReps){ maxReps = r; }
+          if(w === 0 && r > 0 && maxWeight === 0){ maxReps = Math.max(maxReps, r); }
+        });
+
+        if(maxWeight > 0 || maxReps > 0) exercises.push({ name: exName, weight: maxWeight, reps: maxReps });
+      });
+
+      appState.workoutLogs.unshift({
+        id: Date.now(),
+        date: timestamp.toLocaleDateString(),
+        fullDate: timestamp.toLocaleString(),
+        workout: name,
+        type: 'gym',
+        phase: currentPhase,
+        readiness: appState.activeSession.readiness,
+        exercises: exercises
+      });
+
+      appState.activeSession = null;
+      localStorage.removeItem('hockeyV47Active');
+      saveAndRebuild();
+      renderDashboard();
+    }
+
+    // --- HISTORY ---
+    function renderHistory(){
+      toggleQuitBtn(false);
+      updateNav('btn-hist');
+
+      let html = `<h1 style="font-size:22px;margin-bottom:20px;">HISTORY</h1>
+                  <div class="cal-grid" style="margin-bottom:20px;">${generateCalendar()}</div>`;
+
+      if(!appState.workoutLogs.length){
+        html += `<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">NO HISTORY YET</div>`;
+      }
+
+      appState.workoutLogs.forEach(l=>{
+        const isGame = l.type === 'game';
+        const score = calculateReadinessScore(l.readiness);
+        html += `
+          <div class="card" onclick="editLog(${l.id})">
+            <div class="flex-row">
+              <span class="label" style="margin:0;">${escapeHtml(l.date)}</span>
+              <span class="status-badge">${isGame ? 'GAME' : 'GYM'}</span>
+            </div>
+            <div style="font-weight:700;font-size:16px;margin:8px 0;color:#fff;">${escapeHtml(l.workout)}</div>
+            <div class="flex-row">
+              <span class="label" style="margin:0;color:var(--text-muted);">READY: <span style="color:#fff;">${score}%</span></span>
+              ${!isGame ? `<span class="label" style="margin:0;cursor:pointer;color:var(--accent);">EDIT</span>` : ''}
+            </div>
+          </div>`;
+      });
+
+      document.getElementById('app').innerHTML = html;
+    }
+
+    function editLog(id){
+      const log = appState.workoutLogs.find(l=>l.id===id);
+      if(!log) return;
+
+      let details = "";
+      if(log.type === 'game'){
+        details = `<div style="font-size:14px;white-space:pre-wrap;">${escapeHtml(log.notes || '')}</div>`;
+      } else {
+        details = (log.exercises || []).map(e=>`
+          <div class="hist-item">
+            <span style="font-size:14px;font-weight:600;color:#fff;">${escapeHtml(e.name)}</span>
+            <span style="font-size:12px;font-weight:700;color:var(--accent);">${(e.weight>0 ? escapeHtml(e.weight) + 'lbs' : '')} ${escapeHtml(e.reps)} reps</span>
+          </div>`).join('');
+      }
+
+      openModalContent(`
+        <h1 style="font-size:24px;margin-top:20px;">LOG DETAILS</h1>
+        <div class="card">
+          <div class="label">WORKOUT</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:10px;">${escapeHtml(log.workout)}</div>
+          <div class="label">DATE</div>
+          <div>${escapeHtml(log.fullDate || log.date)}</div>
+        </div>
+        <div class="card" style="max-height:40vh;overflow-y:auto;">
+          <div class="label">PERFORMANCE</div>
+          ${details}
+        </div>
+        <button class="btn" style="background:var(--danger);color:#fff;margin-top:20px;" onclick="deleteLog(${id})">DELETE LOG</button>`);
+    }
+
+    function deleteLog(id){
+      if(confirm("Delete this log permanently?")){
+        appState.workoutLogs = appState.workoutLogs.filter(l=>l.id !== id);
+        saveAndRebuild();
+        closeModal();
+        renderHistory();
+      }
+    }
+
+    // --- SETTINGS (FIXED + expanded) ---
+    function renderSettings(){
+      openModalContent(`
+        <h1 style="font-size:24px;margin-top:20px;">SETTINGS</h1>
+
+        <div class="card">
+          <div class="label">ATHLETE PROFILE</div>
+
+          <div class="flex-row" style="margin-top:10px;">
+            <span>WEIGHT (LBS)</span>
+            <input class="input-dark" style="width:120px;padding:8px;" type="number" inputmode="numeric"
+                   value="${escapeHtml(appState.settings.weight)}"
+                   onchange="saveSetting('weight', this.value)">
+          </div>
+
+          <div class="flex-row" style="margin-top:10px;">
+            <span>HEIGHT</span>
+            <input class="input-dark" style="width:120px;padding:8px;" type="text"
+                   value="${escapeHtml(appState.settings.height)}"
+                   onchange="saveSetting('height', this.value)">
+          </div>
+
+          <div class="flex-row" style="margin-top:10px;">
+            <span>SEX</span>
+            <select class="input-dark" style="width:170px;padding:8px;text-align:left;"
+                    onchange="saveSetting('sex', this.value)">
+              <option value="unspecified" ${appState.settings.sex==='unspecified'?'selected':''}>Unspecified</option>
+              <option value="male" ${appState.settings.sex==='male'?'selected':''}>Male</option>
+              <option value="female" ${appState.settings.sex==='female'?'selected':''}>Female</option>
+            </select>
+          </div>
+
+          <div class="flex-row" style="margin-top:10px;">
+            <span>AGE (OPTIONAL)</span>
+            <input class="input-dark" style="width:120px;padding:8px;" type="number" inputmode="numeric" min="0" max="99"
+                   value="${escapeHtml(appState.settings.age || '')}"
+                   onchange="saveSetting('age', this.value)">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="label">READINESS CALIBRATION</div>
+
+          <div class="flex-row" style="margin-top:10px;">
+            <span>GRIP BASELINE (LBS)</span>
+            <input class="input-dark" style="width:120px;padding:8px;" type="number" inputmode="numeric" min="1"
+                   value="${escapeHtml(appState.settings.gripBaseline)}"
+                   onchange="saveSetting('gripBaseline', this.value)">
+          </div>
+
+          <div class="label" style="margin-top:10px;color:var(--text-muted);line-height:1.4;">
+            Grip baseline is used to adjust readiness up/down when you enter today's grip score.
+            Set it to your normal “good day” best-of-3 squeeze.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="label">PROGRAM PERSONALIZATION</div>
+          <div style="color:var(--text-muted);font-size:13px;line-height:1.5;">
+            Suggested weights shown as placeholders are scaled using:
+            <div style="margin-top:8px;">
+              • Your weight (vs 205 lbs reference) <br>
+              • Sex (only if set) <br>
+              • Readiness score (green/yellow/red multiplier)
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="margin-top:12px;" onclick="closeModal(); renderDashboard();">
+            SAVE & RETURN
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="label">DATA MANAGEMENT</div>
+          <button class="btn btn-secondary" onclick="exportData()" style="margin-bottom:8px;">BACKUP DATA (COPY)</button>
+          <button class="btn btn-secondary" onclick="importData()">RESTORE DATA (PASTE)</button>
+        </div>
+
+        <button class="btn btn-secondary" style="border-color:var(--danger);color:var(--danger);margin-top:10px;"
+                onclick="if(confirm('Delete all data?')){localStorage.clear();location.reload();}">
+          RESET APP DATA
+        </button>
+      `);
+    }
+
+    function exportData(){
+      const data = JSON.stringify({ logs: appState.workoutLogs, history: appState.exerciseHistory, settings: appState.settings });
+      navigator.clipboard.writeText(data).then(()=>{ alert("Data copied! Save this string somewhere safe."); });
+    }
+    function importData(){
+      const str = prompt("Paste your backup string here:");
+      if(!str) return;
+      try{
+        const data = JSON.parse(str);
+        if(data.logs && data.history){
+          localStorage.setItem('hockeyV47Logs', JSON.stringify(data.logs));
+          localStorage.setItem('hockeyV47ExHistory', JSON.stringify(data.history));
+          if(data.settings) localStorage.setItem('hockeyV47Settings', JSON.stringify({ ...DEFAULT_SETTINGS, ...data.settings }));
+          alert("Data restored successfully.");
+          location.reload();
+        } else { throw new Error(); }
+      } catch(e){ alert("Invalid data format."); }
+    }
+
+    // --- GRAPH ---
+    function generateSVGGraph(data){
+      if(!data || data.length === 0){
+        return `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:11px;">NO DATA LOGGED</div>`;
+      }
+
+      const maxWeightLog = Math.max(...data.map(d=>parseInt(d.weight)||0));
+      const useReps = maxWeightLog === 0;
+
+      const width=600,height=180,padding=30;
+      const points = data.map(d=>({ val: useReps ? (parseInt(d.reps)||0) : (parseInt(d.weight)||0), date:new Date(d.date) }));
+
+      const maxVal = Math.max(...points.map(p=>p.val), useReps ? 10 : 100);
+      const minVal = Math.min(...points.map(p=>p.val), 0);
+      const range = (maxVal - minVal) || 1;
+
+      let pathD="", circles="", labels="";
+
+      if(points.length === 1){
+        const x=width/2,y=height/2;
+        circles = `<circle cx="${x}" cy="${y}" r="6" fill="var(--accent)" />`;
+        labels = `<text x="${x}" y="${y-15}" text-anchor="middle" fill="var(--accent)" font-size="12" font-weight="bold">${points[0].val} ${useReps?'reps':'lbs'}</text>`;
+      } else {
+        points.forEach((p,i)=>{
+          const x = padding + (i/(points.length-1))*(width - padding*2);
+          const y = height - padding - ((p.val - minVal)/range)*(height - padding*2);
+          pathD += (i===0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+          circles += `<circle cx="${x}" cy="${y}" r="5" fill="var(--bg)" stroke="var(--accent)" stroke-width="3" />`;
+          if(i === points.length-1){
+            labels = `<text x="${x}" y="${y-15}" text-anchor="middle" fill="var(--accent)" font-size="12" font-weight="bold">${p.val}</text>`;
+          }
+        });
+      }
+
+      const label = useReps ? "REPS (BODYWEIGHT)" : "WEIGHT (LBS)";
+      return `<div style="position:absolute;top:10px;right:10px;font-size:9px;color:var(--text-muted);">${label}</div>
+              <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}">
+                <path d="${pathD}" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+                ${circles}${labels}
+              </svg>`;
+    }
+
+    // --- CALENDAR ---
+    function generateCalendar(){
+      const today = new Date();
+      const daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+      let html = '';
+
+      for(let i=1;i<=daysInMonth;i++){
+        const dateStr = new Date(today.getFullYear(), today.getMonth(), i).toLocaleDateString();
+        const dayLogs = appState.workoutLogs.filter(l=>l.date === dateStr);
+
+        const hasGym = dayLogs.some(l=>l.type === 'gym');
+        const hasGame = dayLogs.some(l=>l.type === 'game');
+        const isToday = i === today.getDate();
+
+        let dot = '';
+        if(hasGym || hasGame){
+          if(hasGym && hasGame){
+            dot = `<div class="cal-dot-wrap">
+                    <div class="cal-dot" style="background:var(--accent)"></div>
+                    <div class="cal-dot" style="background:var(--warning)"></div>
+                  </div>`;
+          } else if(hasGym){
+            dot = `<div class="cal-dot" style="background:var(--accent)"></div>`;
+          } else {
+            dot = `<div class="cal-dot" style="background:var(--warning)"></div>`;
+          }
+        }
+
+        html += `<div class="cal-day ${isToday?'today':''}">${i}${dot}</div>`;
+      }
+
+      return html;
+    }
+
+    // --- SESSION OPTIONS (QUIT BUTTON) ---
+    function openSessionOptions(){
+      if(!appState.activeSession){
+        toggleQuitBtn(false);
+        return;
+      }
+
+      openModalContent(`
+        <div class="label" style="margin-top:20px;color:var(--accent);">SESSION OPTIONS</div>
+        <h1 style="font-size:24px;margin-bottom:10px;">Leave session?</h1>
+
+        <div class="card" style="padding:16px;color:var(--text-muted);font-size:13px;line-height:1.5;">
+          <div style="color:#fff;font-weight:700;margin-bottom:6px;">Pause</div>
+          Keeps your session saved so you can resume later from the dashboard.
+        </div>
+
+        <div class="card" style="padding:16px;color:var(--text-muted);font-size:13px;line-height:1.5;">
+          <div style="color:#fff;font-weight:700;margin-bottom:6px;">Cancel</div>
+          Deletes the active session and discards set/notes (does not create a history log).
+        </div>
+
+        <button class="btn" style="background:var(--accent);color:#fff;margin-top:10px;" onclick="pauseSession()">PAUSE SESSION</button>
+        <button class="btn" style="background:var(--danger);color:#fff;margin-top:10px;" onclick="cancelSession()">CANCEL (DISCARD)</button>
+        <button class="btn btn-secondary" style="margin-top:10px;" onclick="closeModal()">STAY</button>
+      `);
+    }
+
+    function pauseSession(){
+      closeModal();
+      renderDashboard();
+    }
+
+    function cancelSession(){
+      closeModal();
+      appState.activeSession = null;
+      localStorage.removeItem('hockeyV47Active');
+      toggleQuitBtn(false);
+      renderDashboard();
+    }
+
+    // --- STORAGE / MISC UTILS ---
+    function getPhase(w){ return w <= 4 ? 1 : (w <= 8 ? 2 : 3); }
+    function updateNav(id){
+      document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+    function saveAndRebuild(){
+      localStorage.setItem('hockeyV47Logs', JSON.stringify(appState.workoutLogs));
+      rebuildExerciseHistory();
+    }
+    function trackInput(id,val){
+      if(!appState.activeSession) return;
+      appState.activeSession.inputs[id] = val;
+      saveActiveState();
+    }
+    function saveActiveState(){ localStorage.setItem('hockeyV47Active', JSON.stringify(appState.activeSession)); }
+    function getSavedValue(id){ return (appState.activeSession && appState.activeSession.inputs[id]) || ''; }
+    function toggleSet(el,id){ el.classList.toggle('active'); trackInput(id, el.classList.contains('active') ? 'true' : 'false'); }
+    function toggleNote(el){ el.parentElement.nextElementSibling.classList.toggle('hidden'); }
+    function changeViewWeek(d){ appState.viewWeek += d; if(appState.viewWeek < 1) appState.viewWeek = 1; renderTraining(); }
+
+    function saveSetting(key, val){
+      // Normalize types where appropriate
+      if(key === 'weight' || key === 'gripBaseline' || key === 'age'){
+        const n = Number(val);
+        appState.settings[key] = Number.isFinite(n) ? n : (key === 'age' ? 0 : appState.settings[key]);
+      } else if(key === 'sex'){
+        const v = String(val || 'unspecified').toLowerCase();
+        appState.settings[key] = (v === 'male' || v === 'female') ? v : 'unspecified';
+      } else {
+        appState.settings[key] = val;
+      }
+      localStorage.setItem('hockeyV47Settings', JSON.stringify(appState.settings));
+    }
+
+    function updateGraph(newEx){ appState.currentGraphEx = newEx; renderDashboard(); }
+
+    function toggleQuitBtn(show){
+      const btn = document.getElementById('global-quit-btn');
+      if(show) btn.classList.remove('hidden'); else btn.classList.add('hidden');
+    }
+
+    // --- DEFINITIVE QUIT BUTTON CLICK FIX + exercise delegation ---
+    (function bindGlobalUIOnce(){
+      const quitBtn = document.getElementById('global-quit-btn');
+      if(quitBtn && !quitBtn.dataset.bound){
+        quitBtn.dataset.bound = 'true';
+        quitBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openSessionOptions(); }, true);
+        quitBtn.addEventListener('touchend', (e)=>{ e.stopPropagation(); openSessionOptions(); }, { capture:true, passive:true });
+
+        document.addEventListener('click', (e)=>{
+          if(e.target && e.target.closest && e.target.closest('#global-quit-btn')){
+            e.stopPropagation();
+            openSessionOptions();
+          }
+        }, true);
+
+        document.addEventListener('touchend', (e)=>{
+          if(e.target && e.target.closest && e.target.closest('#global-quit-btn')){
+            e.stopPropagation();
+            openSessionOptions();
+          }
+        }, { capture:true, passive:true });
+      }
+
+      const appEl = document.getElementById('app');
+      if(appEl && !appEl.dataset.bound){
+        appEl.dataset.bound = 'true';
+
+        appEl.addEventListener('click', (e)=>{
+          const t = e.target.closest('.js-exercise-link');
+          if(!t) return;
+          const idx = Number(t.dataset.exIndex);
+          if(!Number.isFinite(idx)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openExerciseMenu(idx);
+        });
+
+        appEl.addEventListener('keydown', (e)=>{
+          const t = e.target.closest('.js-exercise-link');
+          if(!t) return;
+          if(e.key !== 'Enter' && e.key !== ' ') return;
+          const idx = Number(t.dataset.exIndex);
+          if(!Number.isFinite(idx)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openExerciseMenu(idx);
+        });
+      }
+
+      window.openSessionOptions = openSessionOptions;
+      window.pauseSession = pauseSession;
+      window.cancelSession = cancelSession;
+      window.openExerciseMenu = openExerciseMenu;
+    })();
+
+    // --- SPLASH ---
+    window.addEventListener('load', ()=>{
+      setTimeout(()=>{
+        const splash = document.getElementById('splash');
+        splash.style.opacity = '0';
+        setTimeout(()=>{ splash.remove(); }, 600);
+      }, 1200);
+    });
+
+    // Start
+    renderDashboard();
+  </script>
+</body>
+</html>
