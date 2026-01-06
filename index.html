@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
   <meta name="theme-color" content="#050505" />
-  <title>SILLEY 53 - PRO</title>
+  <title>SILLEY 53</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -329,6 +329,7 @@
       3:{ title:"PHASE 3: VELOCITY & POWER", focus:"RATE OF FORCE DEVELOPMENT (RFD)", desc:"Game speed. Reduced volume to keep legs fresh, focusing on moving sub-maximal weights fast. Minimizing ground contact time." }
     };
 
+    // --- EXERCISE DATABASE (Updated for v54) ---
     const EXERCISE_DB = {
       "Trap-Bar Deadlift": { swaps:["Barbell Deadlift","Sumo Deadlift"], why:"Develops raw lower-body force essential for the skating stride. Neutral grip reduces spinal stress." },
       "Split Squat (DB)": { swaps:["Rear Foot Elev. Split Squat","Walking Lunge"], why:"Builds single-leg structural integrity, correcting imbalances that lead to ACL injury." },
@@ -346,6 +347,7 @@
       "90/90 Hip Flow": { swaps:["Hip Swivels","Gate Openers"], why:"Improves internal/external hip rotation, essential for deep skating stances." },
       "SL Glute Bridge": { swaps:["Bridge","Hip Thrust"], why:"Activates glutes and hamstrings before heavy loading." },
       "Inchworm": { swaps:["Walkouts","Bear Crawl"], why:"Dynamic hamstring stretch and core stability." },
+      "Walkouts": { swaps:["Inchworm","Bear Crawl"], why:"Dynamic core stability and shoulder warm-up." },
       "Lateral Heiden Bound": { swaps:["Skater Jumps","Lateral Lunge"], why:"Develops lateral power and landing mechanics for edge control." },
       "Tibialis Raises": { swaps:["Heel Walks","Toe Taps"], why:"Strengthens shins to prevent shin splints and improve deceleration control." },
       "Pallof Press": { swaps:["Plank","Dead Bug"], why:"Anti-rotation core stability. Helps you stay strong on the puck while being pushed." },
@@ -365,7 +367,14 @@
       "Depth Jump": { swaps:["Drop Jump","Box Jump"], why:"Reactive power. Teaches muscles to switch from stretch to shorten instantly." },
       "DB Shoulder Press": { swaps:["Landmine Press","Push Press"], why:"Vertical pushing strength and shoulder stability." },
       "Lateral Band Walk": { swaps:["Clamshells","Monster Walk"], why:"Glute medius activation for hip stability." },
-      "Lateral Lunge": { swaps:["Cossack Squat","Sumo Squat"], why:"Frontal plane strength. mimic the wide stance of skating." }
+      "Lateral Lunge": { swaps:["Cossack Squat","Sumo Squat"], why:"Frontal plane strength. mimic the wide stance of skating." },
+      "Pull Ups": { swaps:["Lat Pulldown","Chin Up"], why:"Vertical pulling strength for puck battles and upper body stability." },
+      "Swiss Ball Hamstring Curl": { swaps:["Machine Hamstring Curl","Nordic Curl"], why:"Hamstring isolation and stability for injury prevention." },
+      "Push Ups": { swaps:["DB Bench Press","Floor Press"], why:"Fundamental horizontal pushing strength and core integration." },
+      "Plank": { swaps:["Pallof Press","Dead Bug"], why:"Core stiffness and isometric strength." },
+      "Spiderman Lunge": { swaps:["World's Greatest Stretch","Groiner"], why:"Hip mobility and groin flexibility." },
+      "Bear Crawl": { swaps:["Inchworm","Plank"], why:"Shoulder stability and cross-body coordination." },
+      "Lat Pulldown": { swaps:["Pull Ups","Chin Up"], why:"Back width and strength for improved posture on ice." }
     };
 
     const programData = {
@@ -434,7 +443,6 @@
     }
 
     function getSexMultiplier(){
-      // Only apply if explicitly set; otherwise don't guess.
       const s = (appState.settings.sex || "unspecified").toLowerCase();
       if(s === "female") return 0.90;
       if(s === "male") return 1.00;
@@ -444,7 +452,6 @@
     function getBodyweightMultiplier(){
       const w = parseNum(appState.settings.weight);
       if(!w || w <= 0) return 1.0;
-      // Program placeholders were authored around ~205 lbs athlete; scale gently.
       return clamp(w / 205, 0.85, 1.15);
     }
 
@@ -457,37 +464,26 @@
       return Math.max(0, roundTo5(raw));
     }
 
-    // --- readiness score (now includes grip relative to baseline if provided) ---
     function calculateReadinessScore(r){
       if(!r) return 0;
-
       const sleep = clamp(parseInt(r.sleep || 0), 0, 5);
       const energy = clamp(parseInt(r.energy || 0), 0, 5);
       const pain = clamp(parseInt(r.pain || 0), 0, 10);
-
-      // Base: same as before (0..100)
       let base = Math.round(((sleep + energy + (10 - pain)) / 20) * 100);
 
-      // Grip adjustment:
-      // - Only if both baseline + today's grip are present and reasonable
-      // - Adds up to +10 (great CNS day) or down to -15 (fatigued day)
       const baseline = parseNum(appState.settings.gripBaseline);
       const today = parseNum(r.grip);
 
       if(baseline && baseline > 0 && today && today > 0){
-        const ratio = today / baseline; // 1.00 = baseline
-        // Map ratio to adjustment:
-        // 1.10+ => +10, 1.00 => 0, 0.90 => -10, 0.85 => -15
+        const ratio = today / baseline;
         let adj = 0;
         if(ratio >= 1.10) adj = 10;
-        else if(ratio >= 1.00) adj = Math.round((ratio - 1.00) / 0.10 * 10); // 0..10
-        else if(ratio >= 0.90) adj = -Math.round((1.00 - ratio) / 0.10 * 10); // 0..-10
-        else if(ratio >= 0.85) adj = -10 - Math.round((0.90 - ratio) / 0.05 * 5); // -10..-15
+        else if(ratio >= 1.00) adj = Math.round((ratio - 1.00) / 0.10 * 10);
+        else if(ratio >= 0.90) adj = -Math.round((1.00 - ratio) / 0.10 * 10);
+        else if(ratio >= 0.85) adj = -10 - Math.round((0.90 - ratio) / 0.05 * 5);
         else adj = -15;
-
         base = base + adj;
       }
-
       return clamp(base, 0, 100);
     }
 
@@ -786,7 +782,6 @@
 
       const phase = getPhase(appState.activeSession ? appState.activeSession.week : appState.viewWeek);
       const w = programData[phase].find(x=>x.id===id) || programData[1].find(x=>x.id===id);
-
       const rScore = appState.activeSession?.readiness ? calculateReadinessScore(appState.activeSession.readiness) : null;
 
       let readinessBanner = '';
@@ -807,6 +802,7 @@
           </div>`;
       }
 
+      // Reset Active Exercises list on load (rebuilds DOM map)
       appState.activeExercises = [];
 
       let html = `
@@ -819,10 +815,19 @@
       w.blocks.forEach(block=>{
         html += `<div class="section-header">${escapeHtml(block.type)}</div>`;
         block.items.forEach(ex=>{
-          appState.activeExercises.push(ex);
+          // CLONE the exercise object to allow swapping without mutating master program
+          appState.activeExercises.push({ ...ex });
           const exIdx = appState.activeExercises.length - 1;
 
-          const name = ex.name || ex;
+          // For hydration, check if we already swapped this index in the current session
+          // (Current simplistic approach: session reset clears activeExercises, so just use what's pushed)
+          // *Note: In a more complex persistance model, we'd check appState.activeSession.swaps.
+          // For now, we load from programData. If user swapped previously in this session,
+          // it's not persisted in this simple 'inputs' model, but that's acceptable for this scope.
+          // (If we wanted to persist swaps across reloads, we'd need to save activeExercises to localStorage).
+
+          const currentEx = appState.activeExercises[exIdx];
+          const name = currentEx.name || currentEx;
           const safeName = sanitizeId(name);
 
           html += `
@@ -898,7 +903,7 @@
       }
     }
 
-    // --- EXERCISE MENU ---
+    // --- EXERCISE MENU & SWAPS (Fix 2) ---
     function openExerciseMenu(index){
       const ex = appState.activeExercises[index];
       if(!ex) return;
@@ -916,8 +921,9 @@
            </div>`
         : `<div class="card" style="margin-top:15px;color:var(--text-muted);font-size:14px;">No benefit note added for this exercise yet.</div>`;
 
+      // FIX: Added onclick to call performSwap with the index
       const swapsHtml = (db?.swaps && db.swaps.length)
-        ? db.swaps.map(s=>`<button type="button" class="btn btn-secondary" style="margin-bottom:8px;">${escapeHtml(s)}</button>`).join('')
+        ? db.swaps.map(s=>`<button type="button" class="btn btn-secondary" style="margin-bottom:8px;" onclick="performSwap(${index}, '${escapeHtml(s)}')">${escapeHtml(s)}</button>`).join('')
         : `<div class="card" style="padding:16px;color:var(--text-muted);font-size:13px;">No swaps listed.</div>`;
 
       openModalContent(`
@@ -929,6 +935,25 @@
         <a href="https://www.youtube.com/results?search_query=${safeSearch}" target="_blank" rel="noopener"
            class="btn" style="margin-top:15px;">WATCH VIDEO</a>
         <button class="btn btn-secondary" style="margin-top:10px;" onclick="closeModal()">CLOSE</button>`);
+    }
+
+    // New Swap Function Logic
+    function performSwap(index, newName){
+      // 1. Update State
+      if(appState.activeExercises[index]){
+        appState.activeExercises[index].name = newName;
+      }
+
+      // 2. Update DOM
+      const card = document.getElementById('ex_' + index);
+      if(card){
+        card.setAttribute('data-name', newName);
+        const link = card.querySelector('.js-exercise-link');
+        if(link) link.innerText = newName;
+      }
+
+      // 3. Close Modal
+      closeModal();
     }
 
     // --- FINISH SESSION ---
@@ -972,7 +997,7 @@
       renderDashboard();
     }
 
-    // --- HISTORY ---
+    // --- HISTORY (Fix 1: Editable) ---
     function renderHistory(){
       toggleQuitBtn(false);
       updateNav('btn-hist');
@@ -996,7 +1021,7 @@
             <div style="font-weight:700;font-size:16px;margin:8px 0;color:#fff;">${escapeHtml(l.workout)}</div>
             <div class="flex-row">
               <span class="label" style="margin:0;color:var(--text-muted);">READY: <span style="color:#fff;">${score}%</span></span>
-              ${!isGame ? `<span class="label" style="margin:0;cursor:pointer;color:var(--accent);">EDIT</span>` : ''}
+              <span class="label" style="margin:0;cursor:pointer;color:var(--accent);">EDIT</span>
             </div>
           </div>`;
       });
@@ -1008,30 +1033,70 @@
       const log = appState.workoutLogs.find(l=>l.id===id);
       if(!log) return;
 
-      let details = "";
       if(log.type === 'game'){
-        details = `<div style="font-size:14px;white-space:pre-wrap;">${escapeHtml(log.notes || '')}</div>`;
-      } else {
-        details = (log.exercises || []).map(e=>`
-          <div class="hist-item">
-            <span style="font-size:14px;font-weight:600;color:#fff;">${escapeHtml(e.name)}</span>
-            <span style="font-size:12px;font-weight:700;color:var(--accent);">${(e.weight>0 ? escapeHtml(e.weight) + 'lbs' : '')} ${escapeHtml(e.reps)} reps</span>
-          </div>`).join('');
+        // Games remain note-only editing for now
+        openModalContent(`
+          <h1 style="font-size:24px;margin-top:20px;">GAME DETAILS</h1>
+          <div class="card"><div style="font-size:14px;white-space:pre-wrap;">${escapeHtml(log.notes || 'No notes')}</div></div>
+          <button class="btn" style="background:var(--danger);color:#fff;" onclick="deleteLog(${id})">DELETE LOG</button>
+        `);
+        return;
       }
 
+      // GYM LOG EDITING (New Implementation)
+      const exercisesHtml = (log.exercises || []).map((e, i) => `
+        <div class="hist-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+          <div style="font-size:14px;font-weight:600;color:#fff;">${escapeHtml(e.name)}</div>
+          <div class="flex-row" style="width:100%;gap:10px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <input type="number" id="edit-w-${i}" class="input-dark" style="padding:6px;width:70px;text-align:center;" value="${e.weight||0}">
+              <span style="font-size:10px;color:var(--text-muted);">LBS</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <input type="number" id="edit-r-${i}" class="input-dark" style="padding:6px;width:50px;text-align:center;" value="${e.reps||0}">
+              <span style="font-size:10px;color:var(--text-muted);">REPS</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
       openModalContent(`
-        <h1 style="font-size:24px;margin-top:20px;">LOG DETAILS</h1>
+        <h1 style="font-size:24px;margin-top:20px;">EDIT LOG</h1>
         <div class="card">
           <div class="label">WORKOUT</div>
-          <div style="font-size:18px;font-weight:700;margin-bottom:10px;">${escapeHtml(log.workout)}</div>
+          <div style="font-weight:700;margin-bottom:10px;">${escapeHtml(log.workout)}</div>
           <div class="label">DATE</div>
           <div>${escapeHtml(log.fullDate || log.date)}</div>
         </div>
+
         <div class="card" style="max-height:40vh;overflow-y:auto;">
           <div class="label">PERFORMANCE</div>
-          ${details}
+          ${exercisesHtml}
         </div>
-        <button class="btn" style="background:var(--danger);color:#fff;margin-top:20px;" onclick="deleteLog(${id})">DELETE LOG</button>`);
+
+        <button class="btn" style="background:var(--success);color:#fff;margin-top:10px;" onclick="saveLogEdits(${id})">SAVE CHANGES</button>
+        <button class="btn" style="background:var(--danger);color:#fff;margin-top:10px;" onclick="deleteLog(${id})">DELETE LOG</button>
+      `);
+    }
+
+    function saveLogEdits(id){
+      const logIndex = appState.workoutLogs.findIndex(l => l.id === id);
+      if(logIndex === -1) return;
+
+      const log = appState.workoutLogs[logIndex];
+      // Map through existing exercises and grab new values from DOM
+      if(log.exercises){
+        log.exercises.forEach((ex, i) => {
+          const wInput = document.getElementById(`edit-w-${i}`);
+          const rInput = document.getElementById(`edit-r-${i}`);
+          if(wInput) ex.weight = parseFloat(wInput.value) || 0;
+          if(rInput) ex.reps = parseFloat(rInput.value) || 0;
+        });
+      }
+
+      saveAndRebuild();
+      closeModal();
+      renderHistory();
     }
 
     function deleteLog(id){
@@ -1043,28 +1108,25 @@
       }
     }
 
-    // --- SETTINGS (FIXED + expanded) ---
+    // --- SETTINGS (Fix 4: Robust Data Management) ---
     function renderSettings(){
       openModalContent(`
         <h1 style="font-size:24px;margin-top:20px;">SETTINGS</h1>
 
         <div class="card">
           <div class="label">ATHLETE PROFILE</div>
-
           <div class="flex-row" style="margin-top:10px;">
             <span>WEIGHT (LBS)</span>
             <input class="input-dark" style="width:120px;padding:8px;" type="number" inputmode="numeric"
                    value="${escapeHtml(appState.settings.weight)}"
                    onchange="saveSetting('weight', this.value)">
           </div>
-
           <div class="flex-row" style="margin-top:10px;">
             <span>HEIGHT</span>
             <input class="input-dark" style="width:120px;padding:8px;" type="text"
                    value="${escapeHtml(appState.settings.height)}"
                    onchange="saveSetting('height', this.value)">
           </div>
-
           <div class="flex-row" style="margin-top:10px;">
             <span>SEX</span>
             <select class="input-dark" style="width:170px;padding:8px;text-align:left;"
@@ -1074,44 +1136,19 @@
               <option value="female" ${appState.settings.sex==='female'?'selected':''}>Female</option>
             </select>
           </div>
-
-          <div class="flex-row" style="margin-top:10px;">
-            <span>AGE (OPTIONAL)</span>
-            <input class="input-dark" style="width:120px;padding:8px;" type="number" inputmode="numeric" min="0" max="99"
-                   value="${escapeHtml(appState.settings.age || '')}"
-                   onchange="saveSetting('age', this.value)">
-          </div>
         </div>
 
         <div class="card">
           <div class="label">READINESS CALIBRATION</div>
-
           <div class="flex-row" style="margin-top:10px;">
             <span>GRIP BASELINE (LBS)</span>
             <input class="input-dark" style="width:120px;padding:8px;" type="number" inputmode="numeric" min="1"
                    value="${escapeHtml(appState.settings.gripBaseline)}"
                    onchange="saveSetting('gripBaseline', this.value)">
           </div>
-
           <div class="label" style="margin-top:10px;color:var(--text-muted);line-height:1.4;">
             Grip baseline is used to adjust readiness up/down when you enter today's grip score.
-            Set it to your normal “good day” best-of-3 squeeze.
           </div>
-        </div>
-
-        <div class="card">
-          <div class="label">PROGRAM PERSONALIZATION</div>
-          <div style="color:var(--text-muted);font-size:13px;line-height:1.5;">
-            Suggested weights shown as placeholders are scaled using:
-            <div style="margin-top:8px;">
-              • Your weight (vs 205 lbs reference) <br>
-              • Sex (only if set) <br>
-              • Readiness score (green/yellow/red multiplier)
-            </div>
-          </div>
-          <button class="btn btn-secondary" style="margin-top:12px;" onclick="closeModal(); renderDashboard();">
-            SAVE & RETURN
-          </button>
         </div>
 
         <div class="card">
@@ -1124,15 +1161,40 @@
                 onclick="if(confirm('Delete all data?')){localStorage.clear();location.reload();}">
           RESET APP DATA
         </button>
+        <button class="btn btn-secondary" style="margin-top:12px;" onclick="closeModal(); renderDashboard();">
+          CLOSE SETTINGS
+        </button>
       `);
     }
 
     function exportData(){
       const data = JSON.stringify({ logs: appState.workoutLogs, history: appState.exerciseHistory, settings: appState.settings });
-      navigator.clipboard.writeText(data).then(()=>{ alert("Data copied! Save this string somewhere safe."); });
+      // Reliable Fallback: Show Modal with Textarea
+      openModalContent(`
+        <h1 style="font-size:24px;margin-top:20px;">BACKUP</h1>
+        <div class="card">
+          <div class="label">COPY THIS TEXT</div>
+          <textarea id="export-area" class="note-area" style="height:150px;font-size:10px;font-family:monospace;">${data}</textarea>
+        </div>
+        <button class="btn" onclick="document.getElementById('export-area').select();document.execCommand('copy');this.innerText='COPIED!';" style="margin-bottom:8px;">COPY TO CLIPBOARD</button>
+        <button class="btn btn-secondary" onclick="closeModal()">CLOSE</button>
+      `);
     }
+
     function importData(){
-      const str = prompt("Paste your backup string here:");
+      openModalContent(`
+        <h1 style="font-size:24px;margin-top:20px;">RESTORE</h1>
+        <div class="card">
+          <div class="label">PASTE DATA HERE</div>
+          <textarea id="import-area" class="note-area" style="height:150px;font-size:10px;font-family:monospace;"></textarea>
+        </div>
+        <button class="btn" onclick="runImport()">RESTORE NOW</button>
+        <button class="btn btn-secondary" onclick="closeModal()" style="margin-top:8px;">CANCEL</button>
+      `);
+    }
+
+    function runImport(){
+      const str = document.getElementById('import-area').value;
       if(!str) return;
       try{
         const data = JSON.parse(str);
@@ -1284,7 +1346,6 @@
     function changeViewWeek(d){ appState.viewWeek += d; if(appState.viewWeek < 1) appState.viewWeek = 1; renderTraining(); }
 
     function saveSetting(key, val){
-      // Normalize types where appropriate
       if(key === 'weight' || key === 'gripBaseline' || key === 'age'){
         const n = Number(val);
         appState.settings[key] = Number.isFinite(n) ? n : (key === 'age' ? 0 : appState.settings[key]);
@@ -1357,6 +1418,7 @@
       window.pauseSession = pauseSession;
       window.cancelSession = cancelSession;
       window.openExerciseMenu = openExerciseMenu;
+      window.performSwap = performSwap;
     })();
 
     // --- SPLASH ---
